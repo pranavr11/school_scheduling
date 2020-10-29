@@ -29,47 +29,83 @@ from datetime import datetime
 
 class Schedule:
     def __init__(self):
-        classTimes = [('7:30','8:30'), ('8:35','9:35'), ('9:40','10:40'), ('10:45', '11:45'), ('11:45', '12:15'), ('12:15', '12:25'), ('12:30', '12:50'), ('12:55', '13:15'),('13:20', '13:40'), ('13:45', '14:05')]
-        classNames = {"a":["Computer Science", "Web Design", "Spanish 3 Honors", "AP Physics 1", "Lunch", "Office Hours", "Computer Science", "Web Design", "Spanish 3 Honors", "AP Physics 1" ], "b":["PE", "Geometry Honors", "US 1 Honors", "English Honors", "Lunch", "Office Hours","PE", "Geometry Honors", "US 1 Honors", "English Honors",]}
+        self.classTimes = [('7:30','8:30'), ('8:35','9:35'), ('9:40','10:40'), ('10:45', '11:45'), ('11:45', '12:15'), ('12:15', '12:25'), ('12:30', '12:50'), ('12:55', '13:15'),('13:20', '13:40'), ('13:45', '14:05')]
+        self.classNames = {"a":["Computer Science", "Web Design", "Spanish 3 Honors", "AP Physics 1", "Lunch", "Office Hours", "Computer Science", "Web Design", "Spanish 3 Honors", "AP Physics 1" ],
+                            "b":["PE", "Geometry Honors", "US 1 Honors", "English Honors", "Lunch", "Office Hours","PE", "Geometry Honors", "US 1 Honors", "English Honors",]}
         className = ""
-        schoolDay = "a"
+        self.schoolDay = "a"
         self.blockNumber = 0
-        self.current_time = "8:47"
+        #current_time = datetime.now().time()
+        self.current_time = "18:34"
+        self.current_time = datetime.strptime(self.current_time, "%H:%M")
+
     #schoolDay = input("Is today an A day or a B day?")[0].lower()
-    #current_time = datetime.now().time() # current time with seconds, datetime format
-    #current_time = current_time.strftime("%H:%M") # converts current time to string from datetime and truncates seconds, used for finding what class I'm in
-    def current_class():
-        for classTime in classTimes:
-            start_time = classTimes[blockNumber][0]
-            end_time = classTimes[blockNumber][1]
-            if current_time <= end_time and current_time >= start_time:
-                className = classNames[schoolDay][blockNumber]
-                print("Your current class is " + className + ", block " + str(blockNumber+1) + schoolDay.upper() + "." )
+     # current time with seconds, datetime format
+ # converts current time to string from datetime and truncates seconds, used for finding what class I'm in
+    def current_class(self, canPrint):
+        for classTime in self.classTimes:
+            start_time = datetime.strptime(self.classTimes[self.blockNumber][0], "%H:%M")
+            end_time = datetime.strptime(self.classTimes[self.blockNumber][1], "%H:%M")
+            final_class = datetime.strptime(self.classTimes[-1][1], "%H:%M")
+            initial_class = datetime.strptime(self.classTimes[0][0], "%H:%M")
+            self.ifGap = False
+
+            #print('current_time:', self.current_time, 'start_time:', start_time, 'end_time:', end_time,
+                        #'initial_class:', initial_class, 'final_class:', final_class)
+
+            if self.current_time <= end_time and self.current_time >= start_time:
+                className = self.classNames[self.schoolDay][self.blockNumber]
+                if canPrint:
+                    print("Your current class is " + className + ", block " + str(self.blockNumber+1) + self.schoolDay.upper() + "." )
                 break
-            elif current_time > classTimes[-1][1] and current_time < "23:59":
-                print("School has ended for the day.")
-                blockNumber = 0
+            elif self.current_time > final_class and self.current_time < datetime.strptime("23:59", "%H:%M"):
+                if canPrint:
+                    print("School has ended for the day.")
+                self.blockNumber = 0
                 break
-            elif current_time < "00:00" and current_time > classTimes[0][0]:
-                print("School hasn't started yet.")
-                blockNumber = 0
-                break                 #SOMETHING HERE IS GOING WRONG AND I CAN'T FIGURE IT OUT
+            elif self.current_time >= datetime.strptime("00:00", "%H:%M") and self.current_time < initial_class:
+                if canPrint:
+                    print("School hasn't started yet.")
+                self.blockNumber = 0
+                break
+            elif self.current_time >= end_time and self.current_time <= datetime.strptime(self.classTimes[self.blockNumber + 1][0], "%H:%M"):
+                if canPrint:
+                    print("This is the gap between " + self.classNames[self.schoolDay][self.blockNumber] + " and " + self.classNames[self.schoolDay][self.blockNumber+1])
+                self.ifGap = True
+                break
             else:
-                blockNumber += 1
-        return blockNumber
+                # print('else case')
+                self.blockNumber += 1
+        return self.blockNumber
 
 
 
-    blockNumber = current_class() + 1
-    ncurrent_time = datetime.strptime(str(current_time), "%H:%M")      #FIX AFTER CURRENT TIME  #office hours b
-    def next_class():
-        nextClassName = classNames[schoolDay][blockNumber]
-        remaining_time =  datetime.strptime(classTimes[blockNumber][0], "%H:%M") - ncurrent_time
-        remaining_time = remaining_time.total_seconds()//60
-        # converts string back to datetime, this time without seconds
-        if current_time > classTimes[-1][1] and current_time < "23:59":
-                print("No more classes")
+    # blockNumber = current_class() + 1
+          #FIX AFTER CURRENT TIME  #office hours b
+    def next_class(self):
+        if self.ifGap:
+            self.blockNumber = s.current_class(False)
+            nextClassName = self.classNames[self.schoolDay][self.blockNumber+1]
+            remaining_time =  datetime.strptime(self.classTimes[self.blockNumber+1][0], "%H:%M") - self.current_time
+            remaining_time = remaining_time.total_seconds()//60
+
+            if self.current_time > datetime.strptime(self.classTimes[-1][1], "%H:%M") and self.current_time < datetime.strptime("23:59", "%H:%M"):
+                    print("No more classes")
+            else:
+                print("Your next class, " + str(nextClassName) + "(" + str(self.blockNumber+2) + str(self.schoolDay.upper()) + ")" + ","" will start in " + str(int(remaining_time)) + " minutes.")
+                print(self.blockNumber)
         else:
-            print("Your next class, " + str(nextClassName) + "(" + str(blockNumber+1) + str(schoolDay.upper()) + ")" + ","" will start in " + str(int(remaining_time)) + " minutes.")
-            print(blockNumber)
-    next_class()
+            self.blockNumber = s.current_class(False)+1
+            nextClassName = self.classNames[self.schoolDay][self.blockNumber]
+            remaining_time =  datetime.strptime(self.classTimes[self.blockNumber][0], "%H:%M") - self.current_time
+            remaining_time = remaining_time.total_seconds()//60
+        # converts string back to datetime, this time without seconds
+            if self.current_time > datetime.strptime(self.classTimes[-1][1], "%H:%M") and self.current_time < datetime.strptime("23:59", "%H:%M"):
+                    print("No more classes.")
+            else:
+                print("Your next class, " + str(nextClassName) + "(" + str(self.blockNumber+1) + str(self.schoolDay.upper()) + ")" + ","" will start in " + str(int(remaining_time)) + " minutes.")
+
+
+s = Schedule()
+s.current_class(True) # STILL works for now
+s.next_class()
