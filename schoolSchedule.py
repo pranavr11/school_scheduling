@@ -1,6 +1,10 @@
 from datetime import datetime
 
-
+'''
+ERRORS TO BE FIXED WHEN I EVETUALLY REDO THIS a:
+If the time is before school starts it registers next class as second blockNumber
+You probably can't read this code anyway lol
+'''
 '''
 1) Input what school day (A/B) it is today
 2) Give me the name of my current class depending on the current time and day of the week.
@@ -36,8 +40,12 @@ class Schedule:
         self.schoolDay = "a"
         self.blockNumber = 0
         #current_time = datetime.now().time()
-        self.current_time = "18:34"
-        self.current_time = datetime.strptime(self.current_time, "%H:%M")
+        #self.current_time = "8:56"
+        #self.current_time = datetime.strptime(self.current_time, "%H:%M")
+        self.current_time = datetime.now().time()
+        self.current_time = self.current_time.strftime("%H:%M") #
+        self.current_time = datetime.strptime((self.current_time), "%H:%M")
+        print(self.current_time)
 
     #schoolDay = input("Is today an A day or a B day?")[0].lower()
      # current time with seconds, datetime format
